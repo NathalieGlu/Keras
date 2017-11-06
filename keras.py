@@ -36,18 +36,6 @@ test_forged = normalization(test_forged)
 
 X = np.vstack((train_genue, train_forged))
 Y = np.concatenate((np.ones(train_genue.shape[0]), np.zeros(train_forged.shape[0])))
-'''
-for i in range(0, X.shape[0]):
-    a = random.randint(0, X.shape[0]-1)
-    b = random.randint(0, X.shape[0]-1)
-    tmp11 = X[a, :].copy()
-    tmp12 = X[b, :].copy()
-    tmp21 = Y[a].copy()
-    tmp22 = Y[b].copy()
-    X[b, :] = tmp11.copy()
-    X[a, :] = tmp12.copy()
-    Y[b] = tmp21.copy()
-    Y[a] = tmp22.copy()'''
     
 # create model
 model = Sequential()
@@ -58,8 +46,9 @@ model.add(Dense(1, activation="sigmoid", kernel_initializer="uniform"))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 # Fit the model
 tensorboard = TensorBoard(log_dir=".\\output", histogram_freq=0, write_graph=True, write_images=True)
-model.fit(X, Y, epochs=200, batch_size=10, verbose=2, callbacks=[tensorboard])
+# tensorboard embending
 #tensorboard = TensorBoard(log_dir=".\\output", write_graph=True, write_images=True,embeddings_freq=10,embeddings_layer_names=embedding_layer_names, embeddings_metadata=None)
+model.fit(X, Y, epochs=200, batch_size=10, verbose=2, callbacks=[tensorboard])
 # calculate predictions
 predictions = model.predict(X)
 predictions1 = model.predict(test_forged)
