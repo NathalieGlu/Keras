@@ -29,6 +29,11 @@ def normalization(arr):
                 arr[j, i] = arr[j, i]/maximum
     return arr
 
+def shuffle(x, y):
+    stack = np.column_stack((x, y))
+    np.random.shuffle(stack)
+    return stack[:,:stack.shape[1]-1], stack[:, stack.shape[1]-1]
+
 train_genue = normalization(train_genue)
 train_forged = normalization(train_forged)
 test_genue = normalization(test_genue)
@@ -36,6 +41,7 @@ test_forged = normalization(test_forged)
 
 X = np.vstack((train_genue, train_forged))
 Y = np.concatenate((np.ones(train_genue.shape[0]), np.zeros(train_forged.shape[0])))
+X, Y = shuffle(X,Y)
     
 # create model
 model = Sequential()
@@ -44,10 +50,11 @@ model.add(Dense(64, activation="tanh", kernel_initializer="uniform"))
 model.add(Dense(1, activation="sigmoid", kernel_initializer="uniform"))
 # Compile model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-# Fit the model
+# tensorboarg graph
 tensorboard = TensorBoard(log_dir=".\\output", histogram_freq=0, write_graph=True, write_images=True)
 # tensorboard embending
 #tensorboard = TensorBoard(log_dir=".\\output", write_graph=True, write_images=True,embeddings_freq=10,embeddings_layer_names=embedding_layer_names, embeddings_metadata=None)
+# Fit the model
 model.fit(X, Y, epochs=200, batch_size=10, verbose=2, callbacks=[tensorboard])
 # calculate predictions
 predictions = model.predict(X)
@@ -66,19 +73,8 @@ print(predictions2)
 
 for layer in model.layers:
     weights = layer.get_weights()
-
-#kearas model plot
-#from keras.utils import plot_model
-#plot_model(model, to_file='model.png')
-#model.summary()
 '''
-for i in range(0, 164):
-    minimum = train_genue[:, i].min()
-    maximum = train_genue[:, i].max()
-    if maximum == 0:
-        train_genue[:, i] = 0
-    elif minimum == maximum:
-        train_genue[:, i] = 1
-    else:
-        for j in range(0, train_genue.shape[0]):
-            train_genue[j, i] = (0.99*(train_genue[j, i]-minimum)-0.0001*(train_genue[j, i]-maximum))/(maximum-minimum)'''
+kearas model plot
+from keras.utils import plot_model
+plot_model(model, to_file='model.png')
+model.summary()'''
