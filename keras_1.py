@@ -25,14 +25,31 @@ def shuffle(x):
     np.random.shuffle(x)
     return x[:,:]
 
-genue = shuffle(genue)
-forged1 = shuffle(forged1)
+def shuffle_simple(x, y):
+    stack = np.column_stack((x, y))
+    np.random.shuffle(stack)
+    return stack[:,:stack.shape[1]-1], stack[:, stack.shape[1]-1]
 
-train_genue = genue[:25]
-test_genue = genue[25:]
+genue, num1 = shuffle_simple(genue, range(genue.shape[0]))
+forged1, num2 = shuffle_simple(forged1, range(forged1.shape[0]))
 
-train_forged = forged1[:25]
-test_forged = forged1[25:]
+n_genue = 5
+n_forged = 5
+
+f = open('log.txt', 'a')
+for line in num1[:n_genue]:
+    f.write(str(int(line)) + ' ')
+f.write('\n')    
+for line in num2[:n_forged]:
+    f.write(str(int(line)) + ' ')
+f.write('\n')
+f.close()
+
+train_genue = genue[:n_genue]
+test_genue = genue[n_genue:]
+
+train_forged = forged1[:n_forged]
+test_forged = forged1[n_forged:]
 
 def normalization(arr):
     for i in range(0, arr.shape[1]):
@@ -57,7 +74,7 @@ test_forged = normalization(test_forged)
 
 X = np.vstack((train_genue, train_forged))
 Y = np.concatenate((np.ones(train_genue.shape[0]), np.zeros(train_forged.shape[0])))
-X, Y = shuffle(X,Y)
+#X, Y = shuffle(X,Y)
     
 # create model
 model = Sequential()
@@ -72,13 +89,12 @@ tensorboard = TensorBoard(log_dir=".\\output", histogram_freq=0, write_graph=Tru
 '''embedding_layer_names = set(layer.name
                             for layer in model.layers
                             if layer.name.startswith('dense_'))
-print(embedding_layer_names)
-tensorboard = TensorBoard(log_dir='temp', histogram_freq=0, batch_size=32,
+tensorboard = TensorBoard(log_dir='output', histogram_freq=0, batch_size=10,
                            write_graph=True, write_grads=True, write_images=True,
-                           embeddings_freq=10, embeddings_metadata=None,
+                           embeddings_freq=50, embeddings_metadata=None,
                            embeddings_layer_names=embedding_layer_names)'''
 # Fit the model
-model.fit(X, Y, epochs=400, batch_size=10, verbose=2, callbacks=[tensorboard])
+model.fit(X, Y, epochs=50, batch_size=10, verbose=2, callbacks=[tensorboard])
 # calculate predictions
 predictions = model.predict(X)
 predictions1 = model.predict(test_genue)
@@ -100,7 +116,7 @@ print(predictions2)
 print(str(np.count_nonzero(predictions2)) + "/" + str(len(predictions2)))
 
 f = open('log.txt', 'a')
-f.write(str(last-first) + 'sec. ')
+f.write(str(last-first) + ' sec. ')
 f.write(str(np.count_nonzero(predictions)/len(predictions)*100.0) + ' ')
 f.write(str(np.count_nonzero(predictions1)/len(predictions1)*100.0) + ' ')
 f.write(str(np.count_nonzero(predictions2)/len(predictions2)*100.0) + '\n\n')
@@ -113,3 +129,8 @@ kearas model plot
 from keras.utils import plot_model
 plot_model(model, to_file='model.png')
 model.summary()'''
+
+'''
+train_forged = np.vstack((forged1[87],forged1[91],forged1[94],forged1[98]))
+test_forged = np.vstack((forged1[:87],forged1[88:91],forged1[91:94],forged1[96:98],forged1[99:]))
+'''
