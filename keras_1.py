@@ -10,13 +10,32 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.callbacks import TensorBoard
 
-seed = 7
-np.random.seed(seed)
-
-train_genue = np.genfromtxt('.\\train\\g\\text.csv', delimiter=',')
+'''train_genue = np.genfromtxt('.\\train\\g\\text.csv', delimiter=',')
 train_forged = np.genfromtxt('.\\train\\f\\text.csv', delimiter=',')
 test_genue = np.genfromtxt('.\\test\\g\\text.csv', delimiter=',')
-test_forged = np.genfromtxt('.\\test\\f\\text.csv', delimiter=',')
+test_forged = np.genfromtxt('.\\test\\f\\text.csv', delimiter=',')'''
+
+genue = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\Me\\genue.csv', delimiter=',')
+forged1 = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\Dad\\forged.csv', delimiter=',')
+forged2 = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\Maks\\forged.csv', delimiter=',')
+forged3 = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\Mom\\forged.csv', delimiter=',')
+forged4 = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\Tim\\forged.csv', delimiter=',')
+
+def shuffle(x):
+    np.random.shuffle(x)
+    return x[:,:]
+
+genue = shuffle(genue)
+forged1 = shuffle(forged1)
+forged2 = shuffle(forged2)
+forged3 = shuffle(forged3)
+forged4 = shuffle(forged4)
+
+train_genue = genue[:20]
+test_genue = genue[20:]
+
+train_forged = np.vstack((forged1[:3], forged2[:3], forged3[:3], forged4[:3]))
+test_forged = np.vstack((forged1[3:], forged2[3:], forged3[3:], forged4[3:]))
 
 def normalization(arr):
     for i in range(0, arr.shape[1]):
@@ -53,26 +72,36 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']
 # tensorboarg graph
 tensorboard = TensorBoard(log_dir=".\\output", histogram_freq=0, write_graph=True, write_images=True)
 # tensorboard embending
-#tensorboard = TensorBoard(log_dir=".\\output", write_graph=True, write_images=True,embeddings_freq=10,embeddings_layer_names=embedding_layer_names, embeddings_metadata=None)
+'''embedding_layer_names = set(layer.name
+                            for layer in model.layers
+                            if layer.name.startswith('dense_'))
+print(embedding_layer_names)
+tensorboard = TensorBoard(log_dir='temp', histogram_freq=0, batch_size=32,
+                           write_graph=True, write_grads=True, write_images=True,
+                           embeddings_freq=10, embeddings_metadata=None,
+                           embeddings_layer_names=embedding_layer_names)'''
 # Fit the model
-model.fit(X, Y, epochs=200, batch_size=10, verbose=2, callbacks=[tensorboard])
+model.fit(X, Y, epochs=400, batch_size=10, verbose=2, callbacks=[tensorboard])
 # calculate predictions
 predictions = model.predict(X)
-predictions1 = model.predict(test_forged)
-predictions2 = model.predict(test_genue)
+predictions1 = model.predict(test_genue)
+predictions2 = model.predict(test_forged)
 # round predictions as step func
 rounded = [round(x[0]) for x in predictions]
 rounded1 = [round(x[0]) for x in predictions1]
 rounded2 = [round(x[0]) for x in predictions2]
 predictions = Y - rounded
-predictions1 = np.zeros(test_forged.shape[0]) - rounded1
-predictions2 = np.ones(test_genue.shape[0]) - rounded2
+predictions1 = np.ones(test_genue.shape[0]) - rounded1
+predictions2 = np.zeros(test_forged.shape[0]) - rounded2
 print(predictions)
+print(str(np.count_nonzero(predictions)) + "/" + str(len(predictions)))
 print(predictions1)
+print(str(np.count_nonzero(predictions1)) + "/" + str(len(predictions1)))
 print(predictions2)
+print(str(np.count_nonzero(predictions2)) + "/" + str(len(predictions2)))
 
-for layer in model.layers:
-    weights = layer.get_weights()
+'''for layer in model.layers:
+    weights = layer.get_weights()'''
 '''
 kearas model plot
 from keras.utils import plot_model
