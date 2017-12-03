@@ -17,8 +17,8 @@ test_genue = np.genfromtxt('.\\test\\g\\text.csv', delimiter=',')
 test_forged = np.genfromtxt('.\\test\\f\\text.csv', delimiter=',')'''
 
 first = time.time()
-genue = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\2\\Tim\\genue.csv', delimiter=',')
-forged1 = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\2\\Me\\forged.csv', delimiter=',')
+genue = np.genfromtxt('D:\\python\\Keras\\sign\\g\\genue.csv', delimiter=',')
+forged1 = np.genfromtxt('D:\\python\\Keras\\sign\\f\\forged.csv', delimiter=',')
 
 
 def shuffle(x):
@@ -33,8 +33,8 @@ def shuffle_simple(x, y):
 genue, num1 = shuffle_simple(genue, range(genue.shape[0]))
 forged1, num2 = shuffle_simple(forged1, range(forged1.shape[0]))
 
-n_genue = 5
-n_forged = 5
+n_genue = 10
+n_forged = 10
 
 f = open('log.txt', 'a')
 for line in num1[:n_genue]:
@@ -94,7 +94,7 @@ tensorboard = TensorBoard(log_dir='output', histogram_freq=0, batch_size=10,
                            embeddings_freq=50, embeddings_metadata=None,
                            embeddings_layer_names=embedding_layer_names)'''
 # Fit the model
-model.fit(X, Y, epochs=50, batch_size=10, verbose=2, callbacks=[tensorboard])
+model.fit(X, Y, epochs=400, batch_size=10, verbose=2, callbacks=[tensorboard])
 # calculate predictions
 predictions = model.predict(X)
 predictions1 = model.predict(test_genue)

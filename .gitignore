@@ -26,6 +26,7 @@ wheels/
 /output
 /test
 /train
+/sign
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -100,4 +101,3 @@ ENV/
 
 # mypy
 .mypy_cache/
-log.txt
