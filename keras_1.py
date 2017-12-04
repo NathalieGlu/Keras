@@ -9,11 +9,14 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.callbacks import TensorBoard
+import time
 
 '''train_genue = np.genfromtxt('.\\train\\g\\text.csv', delimiter=',')
 train_forged = np.genfromtxt('.\\train\\f\\text.csv', delimiter=',')
 test_genue = np.genfromtxt('.\\test\\g\\text.csv', delimiter=',')
 test_forged = np.genfromtxt('.\\test\\f\\text.csv', delimiter=',')'''
+
+first = time.time()
 
 genue = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\Me\\genue.csv', delimiter=',')
 forged1 = np.genfromtxt('D:\\Downloads\\NN\\Signatures\\Dad\\forged.csv', delimiter=',')
@@ -25,17 +28,30 @@ def shuffle(x):
     np.random.shuffle(x)
     return x[:,:]
 
-genue = shuffle(genue)
-forged1 = shuffle(forged1)
-forged2 = shuffle(forged2)
-forged3 = shuffle(forged3)
-forged4 = shuffle(forged4)
+def shuffle_simple(x, y):
+    stack = np.column_stack((x, y))
+    np.random.shuffle(stack)
+    return stack[:,:stack.shape[1]-1], stack[:, stack.shape[1]-1]
 
-train_genue = genue[:20]
-test_genue = genue[20:]
+genue, num1 = shuffle_simple(genue, range(genue.shape[0]))
 
-train_forged = np.vstack((forged1[:3], forged2[:3], forged3[:3], forged4[:3]))
-test_forged = np.vstack((forged1[3:], forged2[3:], forged3[3:], forged4[3:]))
+n_genue = 7
+n_forged = 2
+
+genue, num = shuffle_simple(genue, range(genue.shape[0]))
+
+
+f = open('logDB.txt', 'a')
+for line in num[:n_genue]:
+    f.write(str(int(line)) + ' ')
+f.write('\n')
+f.close()
+
+train_genue = genue[:n_genue]
+test_genue = genue[n_genue:]
+
+train_forged = np.vstack((forged1[:n_forged], forged2[:n_forged], forged3[:n_forged], forged4[:n_forged]))
+test_forged = np.vstack((forged1[n_forged:], forged2[n_forged:], forged3[n_forged:], forged4[n_forged:]))
 
 def normalization(arr):
     for i in range(0, arr.shape[1]):
@@ -86,6 +102,8 @@ model.fit(X, Y, epochs=400, batch_size=10, verbose=2, callbacks=[tensorboard])
 predictions = model.predict(X)
 predictions1 = model.predict(test_genue)
 predictions2 = model.predict(test_forged)
+last = time.time()
+print (last-first)
 # round predictions as step func
 rounded = [round(x[0]) for x in predictions]
 rounded1 = [round(x[0]) for x in predictions1]
@@ -99,6 +117,13 @@ print(predictions1)
 print(str(np.count_nonzero(predictions1)) + "/" + str(len(predictions1)))
 print(predictions2)
 print(str(np.count_nonzero(predictions2)) + "/" + str(len(predictions2)))
+
+f = open('logDB.txt', 'a')
+f.write(str(last-first) + ' sec. ')
+f.write(str(np.count_nonzero(predictions)/len(predictions)*100.0) + ' ')
+f.write(str(np.count_nonzero(predictions1)/len(predictions1)*100.0) + ' ')
+f.write(str(np.count_nonzero(predictions2)/len(predictions2)*100.0) + '\n\n')
+f.close()
 
 '''for layer in model.layers:
     weights = layer.get_weights()'''
