@@ -39,10 +39,25 @@ n_genue = 7
 n_forged = 2
 
 genue, num = shuffle_simple(genue, range(genue.shape[0]))
-
+forged1, num1 = shuffle_simple(forged1, range(forged1.shape[0]))
+forged2, num2 = shuffle_simple(forged2, range(forged2.shape[0]))
+forged3, num3 = shuffle_simple(forged3, range(forged3.shape[0]))
+forged4, num4 = shuffle_simple(forged4, range(forged4.shape[0]))
 
 f = open('logDB.txt', 'a')
 for line in num[:n_genue]:
+    f.write(str(int(line)) + ' ')
+f.write('\n')
+for line in num1[:n_forged]:
+    f.write(str(int(line)) + ' ')
+f.write('\n')
+for line in num2[:n_forged]:
+    f.write(str(int(line)) + ' ')
+f.write('\n')
+for line in num3[:n_forged]:
+    f.write(str(int(line)) + ' ')
+f.write('\n')
+for line in num4[:n_forged]:
     f.write(str(int(line)) + ' ')
 f.write('\n')
 f.close()
